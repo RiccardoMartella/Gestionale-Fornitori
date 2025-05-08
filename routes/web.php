@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('breads', \App\Http\Controllers\BreadsController::class);
     Route::resource('deliveries', \App\Http\Controllers\DeliveriesController::class);
     Route::resource('dashboard', \App\Http\Controllers\DashboardController::class);
+    Route::resource('points', \App\Http\Controllers\PointController::class);
 
 
 });

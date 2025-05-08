@@ -13,7 +13,12 @@ class Supplier extends Model
         'name',
     ];
 
-    public function bread(){
+    public function bread()
+    {
         return $this->hasMany(Bread::class);
+    }
+    public function pointOfSales()
+    {
+        return $this->belongsToMany(Point::class, 'point_of_sale_supplier');
     }
 }

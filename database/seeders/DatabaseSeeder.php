@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             SupplierSeeder::class,
             BreadSeeder::class,
             UserSeeder::class,
+            PointSeeder::class,
         ]);
     }
 }

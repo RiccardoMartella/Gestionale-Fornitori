@@ -24,5 +24,21 @@ class SupplierSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        DB::table('suppliers')->insert([
+            'name' => 'Forno fff',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('suppliers')->insert([
+            'name' => 'Panificio vvv',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('suppliers')->insert([
+            'name' => 'Panificio rger',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }
