@@ -33,8 +33,6 @@ class SuppliersController extends Controller
     {
         $validated = $request->validated();
         $supplier = Supplier::create($validated);
-
-        
         
         if (isset($validated['points'])) {
             $supplier->pointOfSales()->sync($validated['points']);
