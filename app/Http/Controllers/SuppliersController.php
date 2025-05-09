@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSuppliersRequest;
 use App\Models\Supplier;
-
+use App\Models\Point;
 
 class SuppliersController extends Controller
 {
@@ -14,7 +14,6 @@ class SuppliersController extends Controller
     public function index()
     {
         $suppliers =  Supplier::all();
-
         return view('suppliers.index', ["suppliers" => $suppliers]);
     }
 
@@ -23,7 +22,8 @@ class SuppliersController extends Controller
      */
     public function create()
     {
-        return view('suppliers.create');
+        $points = Point::all();
+        return view('suppliers.create', compact('points'));
     }
 
     /**
@@ -32,8 +32,14 @@ class SuppliersController extends Controller
     public function store(StoreSuppliersRequest $request)
     {
         $validated = $request->validated();
-        Supplier::create($validated);
-        return redirect()->route('dashboard.index');
+        $supplier = Supplier::create($validated);
+        
+        
+        if (isset($validated['points'])) {
+            $supplier->pointOfSales()->sync($validated['points']);
+        }
+        
+        return redirect()->route('dashboard.index')->with('success', 'Fornitore/Punto Vendita creato con successo.');
     }
 
     /**
@@ -41,8 +47,8 @@ class SuppliersController extends Controller
      */
     public function show(string $id)
     {
-        $supplier = Supplier::find($id);
-        $breads = $supplier->bread; 
+        $supplier = Supplier::findOrFail($id);
+        $breads = $supplier->breads; 
 
         return view('suppliers.show', [
             "supplier" => $supplier,
@@ -55,8 +61,10 @@ class SuppliersController extends Controller
      */
     public function edit(string $id)
     {
-        $supplier = Supplier::find($id);
-        return view('suppliers.edit', ["supplier" => $supplier]);
+        $supplier = Supplier::findOrFail($id);
+        $points = Point::all();
+        
+        return view('suppliers.edit', (['supplier' => $supplier,'points' => $points]));
     }
 
     /**
@@ -65,9 +73,19 @@ class SuppliersController extends Controller
     public function update(StoreSuppliersRequest $request, string $id)
     {
         $validated = $request->validated();
-        $supplier = Supplier::find($id);
-        $supplier->update($validated);
-        return redirect()->route('dashboard.index', $supplier->id);
+        $supplier = Supplier::findOrFail($id);
+        $supplier->update([
+            'name' => $validated['name'],
+            'address' => $validated['address'] ?? $supplier->address,
+            'phone' => $validated['phone'] ?? $supplier->phone,
+            'email' => $validated['email'] ?? $supplier->email,
+        ]);
+   
+        if (isset($validated['points'])) {
+            $supplier->pointOfSales()->sync($validated['points']);
+        }
+        
+        return redirect()->route('dashboard.index')->with('success', 'Fornitore aggiornato con successo');
     }
 
     /**
@@ -75,6 +93,8 @@ class SuppliersController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $supplier = Supplier::find($id);
+        $supplier->delete();
+        return redirect()->route('dashboard.index');
     }
 }

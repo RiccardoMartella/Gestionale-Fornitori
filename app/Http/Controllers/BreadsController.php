@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Bread;
+use App\Models\Supplier;
 use App\Http\Requests\StoreBreadsRequest;
+use App\Models\Delivery;
 use Illuminate\Validation\ValidationException;
 
 class BreadsController extends Controller
@@ -16,7 +17,7 @@ class BreadsController extends Controller
     {
         $breads = Bread::all();
 
-        return view('breads.index', ["breads" => $breads]);
+        return view('dashboard.index', ["breads" => $breads]);
     }
 
     /**
@@ -25,7 +26,8 @@ class BreadsController extends Controller
      */
     public function create()
     {
-        return view('breads.create');
+          $suppliers = Supplier::all();
+        return view('breads.create', ["suppliers" => $suppliers]);
     }
 
     /**
@@ -33,20 +35,17 @@ class BreadsController extends Controller
      */
     public function store(StoreBreadsRequest $request)
     {
-        try {
-            $validated = $request->validated();
-            $bread = Bread::create($validated);
-
-            return redirect()->route('dashboard.index', $bread->id);
-        } catch (ValidationException $e) {
-            if ($e->validator->errors()->has('supplier_id')) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['supplier_id' => 'Il fornitore specificato non esiste.']);
-            }
-            
-            throw $e;
+        $validated = $request->validated();
+        
+        $bread = Bread::create([
+            'name' => $validated['name']
+        ]);
+        if (isset($validated['suppliers'])) {
+            $bread->suppliers()->sync($validated['suppliers']);
         }
+
+        return redirect()->route('dashboard.index')
+            ->with('success', 'Pane creato con successo!');
     }
 
     /**
@@ -54,9 +53,9 @@ class BreadsController extends Controller
      */
     public function show(string $id)
     {
-        $bread = Bread::find($id);
+        $bread = Bread::with('suppliers')->findOrFail($id);
         $deliveries = $bread->deliveries;
-
+  
         return view('breads.show', ["bread" => $bread, "deliveries" => $deliveries]);
     }
 
@@ -66,8 +65,9 @@ class BreadsController extends Controller
     public function edit(string $id)
     {
         $bread = Bread::find($id);
+        $suppliers = Supplier::all();
 
-        return view('breads.edit', ["bread" => $bread]);
+        return view('breads.edit', ["bread" => $bread, "suppliers" => $suppliers]);
     }
 
     /**
@@ -87,6 +87,10 @@ class BreadsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $bread = Bread::find($id);
+        $bread->delete();
+
+        return redirect()->route('dashboard.index')
+            ->with('success', 'Pane eliminato con successo!');
     }
 }

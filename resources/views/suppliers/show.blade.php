@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Fornitori') }}
+            {{ __('Dettaglio Fornitore') }}
         </h2>
     </x-slot>
 
@@ -20,26 +20,131 @@
                 
                     <h1 class="text-2xl font-bold mb-6 text-center border-b border-gray-200 dark:border-gray-700 pb-4">{{$supplier->name}}</h1>
                     
-                    <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">Tipi di Pane</h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        @foreach ($breads as $item)
-                            <a href="{{ route('breads.show', $item->id) }}"
-                               class="btn-orange flex items-center justify-center">
-                                {{ $item->name }}
-                            </a>
-                        @endforeach
-                        
-                        @if(count($breads) == 0)
-                            <p class="text-gray-500 dark:text-gray-400 col-span-full text-center py-4 bg-gray-50 dark:bg-gray-700 rounded-md">
-                                <svg class="w-6 h-6 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                                </svg>
-                                Nessun tipo di pane disponibile per questo fornitore.
+                    <!-- Dettagli Fornitore -->
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700 mb-8">
+                        <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                                Informazioni Fornitore
+                            </h3>
+                            <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                                Dettagli e informazioni di contatto
                             </p>
-                        @endif
+                        </div>
+                        <div class="border-t border-gray-200 dark:border-gray-700">
+                            <dl>
+                                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                        Nome completo
+                                    </dt>
+                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                        {{ $supplier->name }}
+                                    </dd>
+                                </div>
+                                <div class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                        Indirizzo
+                                    </dt>
+                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                        {{ $supplier->address ?? 'Non specificato' }}
+                                    </dd>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                        Email
+                                    </dt>
+                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                        {{ $supplier->email ?? 'Non specificato' }}
+                                    </dd>
+                                </div>
+                                <div class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                        Telefono
+                                    </dt>
+                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                        {{ $supplier->phone ?? 'Non specificato' }}
+                                    </dd>
+                                </div>
+                                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                        Punti Vendita
+                                    </dt>
+                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                        @if($supplier->pointOfSales && $supplier->pointOfSales->count() > 0)
+                                            <div class="space-y-2">
+                                                @foreach($supplier->pointOfSales as $point)
+                                                    <a href="{{ route('points.show', $point->id) }}" class="block font-medium text-gray-800 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-400">
+                                                        {{ strtoupper($point->name) }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            Nessun punto vendita associato
+                                        @endif
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
                     </div>
                     
+                    {{-- <div class="flex justify-end space-x-3 mb-8">
+                        <a href="{{ route('suppliers.edit', $supplier->id) }}" class="px-4 py-2 bg-amber-500 text-white font-medium rounded-md shadow-sm hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50">
+                            Modifica
+                        </a>
+                        <form action="{{ route('suppliers.destroy', $supplier->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="px-4 py-2 bg-red-600 text-white font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                                    onclick="return confirm('Sei sicuro di voler eliminare questo fornitore?')">
+                                Elimina
+                            </button>
+                        </form>
+                    </div> --}}
+                    
+                    
+                    <h2 class="text-xl font-semibold mb-3 text-gray-700 dark:text-gray-300">Tipi di Pane</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        @if($breads && $breads->count() > 0)
+                            @foreach ($breads as $bread)
+                                <a href="{{ route('breads.show', $bread->id) }}" 
+                                    class="flex items-center p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                                    <div class="flex-shrink-0 mr-4">
+                                        <div class="h-10 w-10 bg-yellow-100 dark:bg-yellow-700 rounded-full flex items-center justify-center">
+                                            <svg class="h-5 w-5 text-yellow-500 dark:text-yellow-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <span class="font-medium text-gray-800 dark:text-white">{{ $bread->name }}</span>
+                                </a>
+                            @endforeach
+                        @else
+                            <p class="text-gray-500 col-span-full text-center py-4">Nessun tipo di pane associato a questo fornitore.</p>
+                        @endif
+                    </div>
+                        
+                        <h2 class="text-xl font-semibold mb-3 mt-6 text-gray-700 dark:text-gray-300">Punti Vendita</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+                            @forelse ($supplier->pointOfSales as $point)
+                                <a href="{{ route('points.show', $point->id) }}" 
+                                   class="flex items-center p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                                    <div class="flex-shrink-0 mr-4">
+                                        <div class="h-10 w-10 bg-orange-100 dark:bg-orange-700 rounded-full flex items-center justify-center">
+                                            <svg class="h-5 w-5 text-orange-500 dark:text-orange-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <span class="font-medium text-gray-800 dark:text-white">{{ $point->name }}</span>
+                                </a>
+                            @empty
+                                <div class="col-span-full text-center py-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <p class="text-gray-500 dark:text-gray-400">Nessun punto vendita associato</p>
+                                </div>
+                            @endforelse
+                        </div>
                 </div>
             </div>
         </div>

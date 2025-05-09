@@ -10,24 +10,31 @@ class Delivery extends Model
     use HasFactory;
 
     protected $fillable = [
-        'bread_id',
-        'user_id',
-        'quantity',
-        'expected_quantity',
         'delivery_date',
+        'bread_id',
+        'point_id',
+        'expected_quantity',
+        'quantity',
+        'user_id'
     ];
 
-    public function bread(){  
-
+    public function bread()
+    {
         return $this->belongsTo(Bread::class);
-
     }
 
-    public function supplier(){
-
-        return $this->belongsTo(Supplier::class);
-        
+    public function breads()
+    {
+        return $this->belongsToMany(Bread::class, 'deliveries_breads', 'deliveries_id', 'breads_id');
     }
 
+    public function point()
+    {
+        return $this->belongsTo(Point::class);
+    }
     
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

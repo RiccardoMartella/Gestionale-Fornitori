@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Delivery;
 use App\Models\Bread;
 use App\Models\Supplier;
-
+use App\Models\Point;
 
 class DashboardController extends Controller
 {
@@ -15,14 +15,16 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $breads = Bread::with('supplier')->get();
+        $suppliers = Supplier::with('pointOfSales')->get();
+        $breads = Bread::with('suppliers')->get();
         $deliveries = Delivery::with(['bread', 'bread.supplier'])->get();
-        $suppliers = Supplier::all();
+        $points = Point::with('suppliers')->get();
 
         return view('dashboard.index', [
+            'suppliers' => $suppliers,
             'breads' => $breads,
             'deliveries' => $deliveries,
-            'suppliers' => $suppliers,
+            'points' => $points,
         ]);
     }
 

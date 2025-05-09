@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('deliveries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('bread_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('bread_id')->constrained()->onDelete('cascade');
             $table->date('delivery_date');
             $table->decimal('quantity');
             $table->decimal('expected_quantity');

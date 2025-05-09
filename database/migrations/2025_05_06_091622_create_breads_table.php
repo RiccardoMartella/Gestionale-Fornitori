@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('breads', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('supplier_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

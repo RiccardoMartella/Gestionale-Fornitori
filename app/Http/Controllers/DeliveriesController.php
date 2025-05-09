@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreDeliveryRequest;
+use App\Http\Requests\StoreDeliveriesRequest;
 use App\Models\Delivery;
 use App\Models\Bread;
 use Illuminate\Support\Facades\Log;
@@ -26,7 +26,7 @@ class DeliveriesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreDeliveryRequest $request)
+    public function store(StoreDeliveriesRequest $request)
     {
         $validated = $request->validated();
         $validated['user_id'] = auth()->id();
@@ -60,7 +60,7 @@ class DeliveriesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreDeliveryRequest $request, string $id)
+    public function update(StoreDeliveriesRequest $request, string $id)
     {
         $validated = $request->validated();
         $validated['user_id'] = auth()->id();
@@ -80,12 +80,10 @@ class DeliveriesController extends Controller
             $breadId = $delivery->bread_id;
             $delivery->delete();
             
-            // Log di successo
             Log::info('Consegna eliminata con successo', ['delivery_id' => $id, 'bread_id' => $breadId]);
             
             return redirect()->route('breads.show', $breadId)->with('success', 'Consegna eliminata con successo.');
         } catch (\Exception $e) {
-            // Log dell'errore
             Log::error('Errore eliminazione consegna', [
                 'delivery_id' => $id,
                 'error' => $e->getMessage()

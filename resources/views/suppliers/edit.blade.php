@@ -31,7 +31,33 @@
                                     <input type="text" name="name" id="name" 
                                         class="w-full border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white" required value="{{$supplier->name}}">
                                 </div>
-                            
+                                <div>
+                                    <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Indirizzo</label>
+                                    <input type="text" name="address" id="address" 
+                                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white" value="{{$supplier->address}}">
+                                </div>
+                                <div>
+                                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tel.</label>
+                                    <input type="text" name="phone" id="phone" 
+                                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white" value="{{$supplier->phone}}">
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                                    <input type="text" name="email" id="email" 
+                                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white" value="{{$supplier->email}}">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="points" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Punti Vendita</label>
+                                    <select name="points[]" id="points" multiple
+                                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white">
+                                        @foreach($points as $point)
+                                            <option value="{{ $point->id }}" {{ $supplier->pointOfSales->contains($point->id) ? 'selected' : '' }}>
+                                                {{ $point->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <p class="text-xs text-gray-500 mt-1">Tenere premuto CTRL (o CMD su Mac) per selezionare più punti vendita</p>
+                                </div>
                             </div>
                             <div class="pt-4 flex justify-center">
                                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200">

@@ -11,11 +11,10 @@ class Bread extends Model
 
     protected $fillable = [
         'name',
-        'supplier_id',
     ];
 
-    public function supplier(){
-        return $this->belongsTo(Supplier::class);
+    public function suppliers(){
+        return $this->belongsToMany(Supplier::class);
     }
 
     public function deliveries(){

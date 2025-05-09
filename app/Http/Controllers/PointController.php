@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePointRequest;
 use Illuminate\Http\Request;
 use App\Models\Point;
 use App\Models\Supplier;
@@ -29,16 +30,13 @@ class PointController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePointRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'supplier_id' => 'required|exists:suppliers,id',
-        ]);
+        $validated = $request->validated();
+        $point = Point::create($validated);
+        $point->suppliers()->sync($validated['suppliers']);
 
-        Point::create($validated);
-
-        return redirect()->route('points.index')
+        return redirect()->route('dashboard.index')
             ->with('success', 'Punto vendita creato con successo!');
     }
 
@@ -64,17 +62,18 @@ class PointController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(StorePointRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'supplier_id' => 'required|exists:suppliers,id',
-        ]);
-
+        $validated = $request->validated();
+        
         $point = Point::findOrFail($id);
-        $point->update($validated);
+        $point->update(['name' => $validated['name']]);
+        
+        if (isset($validated['suppliers'])) {
+            $point->suppliers()->sync($validated['suppliers']);
+        }
 
-        return redirect()->route('points.index')
+        return redirect()->route('dashboard.index')
             ->with('success', 'Punto vendita aggiornato con successo!');
     }
 
@@ -86,7 +85,7 @@ class PointController extends Controller
         $point = Point::findOrFail($id);
         $point->delete();
 
-        return redirect()->route('points.index')
+        return redirect()->route('dashboard.index')
             ->with('success', 'Punto vendita eliminato con successo!');
     }
 }
