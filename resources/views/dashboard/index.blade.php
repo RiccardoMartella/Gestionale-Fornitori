@@ -189,6 +189,13 @@
                     <section>
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-xl font-semibold">Ultime Consegne</h2>
+                            <a href="{{ route('deliveries.create') }}" 
+                               class="px-4 py-2 bg-green-600 text-white font-medium rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-all duration-200 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Registra nuova consegna
+                            </a>
                         </div>
                         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700">
                             <div class="overflow-x-auto">
@@ -211,8 +218,8 @@
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ date('d/m/Y', strtotime($delivery->delivery_date)) }}</td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $delivery->bread->name }}</td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        @if(isset($delivery->point_id) && $delivery->point)
-                                                            {{ $delivery->point->name }}
+                                                        @if($delivery->bread->suppliers->isNotEmpty() && $delivery->bread->suppliers->first()->pointOfSales->isNotEmpty())
+                                                            {{ $delivery->bread->suppliers->first()->pointOfSales->first()->name }}
                                                         @else
                                                             N/D
                                                         @endif
@@ -227,7 +234,15 @@
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $delivery->expected_quantity }} kg</td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $delivery->quantity }} kg</td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                        <a href="{{ route('deliveries.edit', $delivery->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">Modifica</a>
+                                                        <a href="{{ route('deliveries.edit', $delivery->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">Modifica</a>
+                                                        <form action="{{ route('deliveries.destroy', $delivery->id) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200" 
+                                                                onclick="return confirm('Sei sicuro di voler eliminare questa consegna?')">
+                                                                Elimina
+                                                            </button>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                             @endforeach

@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AssociationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/bread/{bread}/associations', [AssociationController::class, 'breadAssociations']);
+Route::get('/supplier/{supplier}/associations', [AssociationController::class, 'supplierAssociations']);
+Route::get('/point/{point}/associations', [AssociationController::class, 'pointAssociations']);

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 class Delivery extends Model
 {
     use HasFactory;
@@ -15,7 +14,8 @@ class Delivery extends Model
         'point_id',
         'expected_quantity',
         'quantity',
-        'user_id'
+        'user_id',
+        'supplier_id',
     ];
 
     public function bread()
@@ -23,16 +23,16 @@ class Delivery extends Model
         return $this->belongsTo(Bread::class);
     }
 
-    public function breads()
-    {
-        return $this->belongsToMany(Bread::class, 'deliveries_breads', 'deliveries_id', 'breads_id');
-    }
-
     public function point()
     {
         return $this->belongsTo(Point::class);
     }
-    
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

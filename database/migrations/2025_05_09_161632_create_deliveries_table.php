@@ -13,11 +13,17 @@ return new class extends Migration
     {
         Schema::create('deliveries', function (Blueprint $table) {
             $table->id();
+
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+
             $table->foreignId('bread_id')->constrained()->onDelete('cascade');
+            $table->foreignId('point_id')->nullable()->constrained('points_of_sales')->onDelete('cascade');
+            $table->foreignId('supplier_id')->nullable()->constrained('suppliers')->onDelete('cascade');
+
             $table->date('delivery_date');
-            $table->decimal('quantity');
-            $table->decimal('expected_quantity');
+            $table->decimal('quantity', 8, 2);
+            $table->decimal('expected_quantity', 8, 2);
+
             $table->timestamps();
         });
     }

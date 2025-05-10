@@ -34,7 +34,10 @@ class PointController extends Controller
     {
         $validated = $request->validated();
         $point = Point::create($validated);
-        $point->suppliers()->sync($validated['suppliers']);
+        
+        if (isset($validated['suppliers']) && !empty($validated['suppliers'])) {
+            $point->suppliers()->sync($validated['suppliers']);
+        }
 
         return redirect()->route('dashboard.index')
             ->with('success', 'Punto vendita creato con successo!');

@@ -17,7 +17,7 @@ class DashboardController extends Controller
     {
         $suppliers = Supplier::with('pointOfSales')->get();
         $breads = Bread::with('suppliers')->get();
-        $deliveries = Delivery::with(['bread', 'bread.supplier'])->get();
+        $deliveries = Delivery::with(['bread', 'bread.suppliers', 'point'])->get();
         $points = Point::with('suppliers')->get();
 
         return view('dashboard.index', [

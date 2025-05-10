@@ -23,7 +23,7 @@ class StorePointRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'suppliers' => 'required|array',
+            'suppliers' => 'sometimes|array',
             'suppliers.*' => 'exists:suppliers,id',
         ];
     }

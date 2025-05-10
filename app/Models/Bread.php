@@ -13,11 +13,14 @@ class Bread extends Model
         'name',
     ];
 
-    public function suppliers(){
-        return $this->belongsToMany(Supplier::class);
+    public function suppliers()
+    {
+        return $this->belongsToMany(Supplier::class, 'bread_supplier');
     }
 
-    public function deliveries(){
+
+    public function deliveries()
+    {
         return $this->hasMany(Delivery::class);
     }
 }

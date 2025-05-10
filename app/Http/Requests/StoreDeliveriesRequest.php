@@ -24,6 +24,8 @@ class StoreDeliveriesRequest extends FormRequest
         return [
             'bread_id' => 'required|exists:breads,id',
             'user_id' => 'sometimes|exists:users,id',
+            'supplier_id' => 'sometimes|exists:suppliers,id',
+            'points_of_sales_id' => 'sometimes|exists:points_of_sales,id',    
             'expected_quantity' => 'required|numeric|min:0',
             'quantity' => 'required|numeric|min:0',
             'delivery_date' => 'required|date',
