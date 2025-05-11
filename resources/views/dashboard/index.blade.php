@@ -135,9 +135,9 @@
                     <!-- Tipi di Pane -->
                     <section class="mb-12">
                         <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-semibold">Tipi di Pane</h2>
+                            <h2 class="text-xl font-semibold">Prodotto</h2>
                             <a href="{{ route('breads.create') }}" class="px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-all duration-200">
-                                <span>+ Nuovo Tipo di Pane</span>
+                                <span>+ Nuovo Prodotto</span>
                             </a>
                         </div>
                         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700">
@@ -231,8 +231,8 @@
                                                             N/D
                                                         @endif
                                                     </td>
-                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $delivery->expected_quantity }} kg</td>
-                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $delivery->quantity }} kg</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $delivery->expected_quantity }} {{$delivery->unit}}</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $delivery->quantity }} {{$delivery->unit}}</td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                         <a href="{{ route('deliveries.edit', $delivery->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">Modifica</a>
                                                         <form action="{{ route('deliveries.destroy', $delivery->id) }}" method="POST" class="inline">
@@ -251,6 +251,76 @@
                                 @else
                                     <div class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                         Nessuna consegna registrata.
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Ultimi Resi -->
+                    <section>
+                        <div class="flex justify-between items-center mb-4  mt-6">
+                            <h2 class="text-xl font-semibold">Ultimi Resi</h2>
+                            <a href="{{ route('returns.create') }}" 
+                               class="px-4 py-2 bg-green-600 text-white font-medium rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-all duration-200 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Registra nuovo reso
+                            </a>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700">
+                            <div class="overflow-x-auto">
+                                @if(isset($returns) && count($returns) > 0)
+                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                        <thead class="bg-gray-50 dark:bg-gray-700">
+                                            <tr>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Data</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Prodotto</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Punto Vendita</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Fornitore</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantità Restituita</th>
+                                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Azioni</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                            @foreach($returns->sortByDesc('delivery_date')->take(10) as $return)
+                                                <tr>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ date('d/m/Y', strtotime($return->delivery_date)) }}</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $return->bread->name }}</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                        @if($return->point)
+                                                            {{ $return->point->name }}
+                                                        @else
+                                                            N/D
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                        @if($return->supplier)
+                                                            {{ $return->supplier->name }}
+                                                        @else
+                                                            N/D
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $return->quantity }} {{$return->unit}}</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                        <a href="{{ route('returns.edit', $return->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">Modifica</a>
+                                                        <form action="{{ route('returns.destroy', $return->id) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200" 
+                                                                onclick="return confirm('Sei sicuro di voler eliminare questo reso?')">
+                                                                Elimina
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                @else
+                                    <div class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                        Nessun reso registrato.
                                     </div>
                                 @endif
                             </div>

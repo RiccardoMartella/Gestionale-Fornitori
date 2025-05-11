@@ -11,20 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('deliveries', function (Blueprint $table) {
+        Schema::create('return_deliveries', function (Blueprint $table) {
             $table->id();
-
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-
             $table->foreignId('bread_id')->constrained()->onDelete('cascade');
             $table->foreignId('point_id')->nullable()->constrained('points_of_sales')->onDelete('cascade');
             $table->foreignId('supplier_id')->nullable()->constrained('suppliers')->onDelete('cascade');
-
             $table->date('delivery_date');
             $table->decimal('quantity', 8, 2);
             $table->string('unit');
             $table->decimal('expected_quantity', 8, 2);
-
             $table->timestamps();
         });
     }
@@ -34,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('deliveries');
+        Schema::dropIfExists('return_deliveries');
     }
 };

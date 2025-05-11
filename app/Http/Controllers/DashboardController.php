@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Delivery;
+use App\Models\ReturnDelivery;
 use App\Models\Bread;
 use App\Models\Supplier;
 use App\Models\Point;
@@ -18,12 +19,14 @@ class DashboardController extends Controller
         $suppliers = Supplier::with('pointOfSales')->get();
         $breads = Bread::with('suppliers')->get();
         $deliveries = Delivery::with(['bread', 'bread.suppliers', 'point'])->get();
+        $returns = ReturnDelivery::with(['bread', 'supplier', 'point'])->get();
         $points = Point::with('suppliers')->get();
-
+        
         return view('dashboard.index', [
             'suppliers' => $suppliers,
             'breads' => $breads,
             'deliveries' => $deliveries,
+            'returns' => $returns,
             'points' => $points,
         ]);
     }

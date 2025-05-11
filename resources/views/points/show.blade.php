@@ -20,7 +20,32 @@
                 
                     <h1 class="text-2xl font-bold mb-6 text-center border-b border-gray-200 dark:border-gray-700 pb-4">{{ $point->name }}</h1>
                     
-                    <!-- Dettagli Punto Vendita -->
+                    <div class="mb-10">
+                        <h2 class="text-xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Stato Inventario</h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6">
+                                <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-white">Inventario in Chilogrammi</h3>
+                                <div class="relative" style="height: 300px;">
+                                    <canvas id="kgInventoryChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6">
+                                <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-white">Inventario in Litri</h3>
+                                <div class="relative" style="height: 300px;">
+                                    <canvas id="litriInventoryChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6 col-span-1 lg:col-span-2">
+                                <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-white">Andamento Inventario</h3>
+                                <div class="relative" style="height: 300px;">
+                                    <canvas id="inventoryTrendChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700 mb-8">
                         <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
                             <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
@@ -43,20 +68,6 @@
                             </dl>
                         </div>
                     </div>
-                    
-                    {{-- <div class="flex justify-end space-x-3 mb-8">
-                        <a href="{{ route('points.edit', $point->id) }}" class="px-4 py-2 bg-amber-500 text-white font-medium rounded-md shadow-sm hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50">
-                            Modifica
-                        </a>
-                        <form action="{{ route('points.destroy', $point->id) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="px-4 py-2 bg-red-600 text-white font-medium rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-                                    onclick="return confirm('Sei sicuro di voler eliminare questo punto vendita?')">
-                                Elimina
-                            </button>
-                        </form>
-                    </div> --}}
                     
                     <h2 class="text-xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Fornitori Associati</h2>
                     
@@ -97,4 +108,152 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inventoryData = @json($inventoryData ?? []);
+            
+            const kgProducts = inventoryData.filter(item => item.unit === 'kg');
+            const litriProducts = inventoryData.filter(item => item.unit === 'litri');
+            
+            if (kgProducts.length > 0) {
+                const kgCtx = document.getElementById('kgInventoryChart').getContext('2d');
+                new Chart(kgCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: kgProducts.map(product => product.name),
+                        datasets: [{
+                            label: 'Quantità (kg)',
+                            data: kgProducts.map(product => product.quantity),
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.7)',
+                                'rgba(255, 99, 132, 0.7)',
+                                'rgba(255, 206, 86, 0.7)',
+                                'rgba(75, 192, 192, 0.7)',
+                                'rgba(153, 102, 255, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Chilogrammi'
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('kgInventoryChart').parentNode.innerHTML = 
+                    '<div class="flex flex-col items-center justify-center h-full">' +
+                        '<svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 005.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />' +
+                        '</svg>' +
+                        '<p class="text-gray-500 text-center">Nessun prodotto in kg in inventario</p>' +
+                    '</div>';
+            }
+            
+            if (litriProducts.length > 0) {
+                const litriCtx = document.getElementById('litriInventoryChart').getContext('2d');
+                new Chart(litriCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: litriProducts.map(product => product.name),
+                        datasets: [{
+                            label: 'Quantità (litri)',
+                            data: litriProducts.map(product => product.quantity),
+                            backgroundColor: [
+                                'rgba(255, 159, 64, 0.7)',
+                                'rgba(153, 102, 255, 0.7)',
+                                'rgba(255, 99, 132, 0.7)',
+                                'rgba(54, 162, 235, 0.7)',
+                                'rgba(75, 192, 192, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 159, 64, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(75, 192, 192, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Litri'
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('litriInventoryChart').parentNode.innerHTML = 
+                    '<div class="flex flex-col items-center justify-center h-full">' +
+                        '<svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 005.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />' +
+                        '</svg>' +
+                        '<p class="text-gray-500 text-center">Nessun prodotto in litri in inventario</p>' +
+                    '</div>';
+            }
+            
+            const trendCtx = document.getElementById('inventoryTrendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'].slice(0, new Date().getMonth() + 1),
+                    datasets: [
+                        {
+                            label: 'Totale in Kg',
+                            data: @json($monthlyTotalsKg ?? array_fill(0, 12, 0)),
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Totale in Litri',
+                            data: @json($monthlyTotalsLitri ?? array_fill(0, 12, 0)),
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout>

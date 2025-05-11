@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Crea Nuova Consegna') }}
+            {{ __('Crea Nuovo Reso') }}
         </h2>
     </x-slot>
     <div class="py-12">
@@ -17,10 +17,10 @@
                 </div>
 
                 <h1 class="text-2xl font-bold mb-6 text-center border-b border-gray-200 pb-4 text-white dark:border-gray-700">
-                    Nuova Consegna
+                    Nuovo Reso
                 </h1>
 
-                <form action="{{ route('deliveries.store') }}" method="POST" class="space-y-6">
+                <form action="{{ route('returns.store') }}" method="POST" class="space-y-6">
                     @csrf
                     @method('POST')
 
@@ -30,7 +30,7 @@
                         <div class="mb-4">
                             <label for="bread_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prodotto</label>
                             <select name="bread_id" id="bread_id" class="form-select" required>
-                                <option value="">-- Seleziona tipo di Prodotto --</option>
+                                <option value="">-- Seleziona prodotto --</option>
                                 @foreach($breads as $bread)
                                     <option value="{{ $bread->id }}">{{ $bread->name }}</option>
                                 @endforeach
@@ -70,25 +70,19 @@
                         </select>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="expected_quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantità prevista</label>
-                            <input type="number" name="expected_quantity" id="expected_quantity" class="form-input" required>
-                        </div>
-                        <div>
-                            <label for="quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantità effettiva</label>
-                            <input type="number" name="quantity" id="quantity" class="form-input" required>
-                        </div>
+                    <div>
+                        <label for="quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantità da restituire</label>
+                        <input type="number" name="quantity" id="quantity" class="form-input" required>
                     </div>
 
                     <div>
-                        <label for="delivery_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data di consegna</label>
+                        <label for="delivery_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data di reso</label>
                         <input type="date" name="delivery_date" id="delivery_date" value="{{ date('Y-m-d') }}" class="form-input md:w-1/2 mx-auto block" required>
                     </div>
 
                     <div class="pt-4 flex justify-center">
                         <button type="submit" class="btn-primary">
-                            Conferma consegna
+                            Conferma reso
                         </button>
                     </div>
                 </form>
@@ -99,13 +93,13 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const breadSelect = document.getElementById('bread_id');
-        const supplierSelect = document.getElementById('supplier_id');
         const pointSelect = document.getElementById('point_of_sale_id');
+        const supplierSelect = document.getElementById('supplier_id');
 
         const originalOptions = {
             bread: breadSelect ? breadSelect.innerHTML : '',
-            supplier: supplierSelect ? supplierSelect.innerHTML : '',
-            point: pointSelect ? pointSelect.innerHTML : ''
+            point: pointSelect ? pointSelect.innerHTML : '',
+            supplier: supplierSelect ? supplierSelect.innerHTML : ''
         };
 
         const toggleLoading = (selects, isLoading = true) => {
@@ -208,49 +202,23 @@
                 const breadId = this.value;
                 
                 if (!breadId) {
-                    if (supplierSelect) supplierSelect.innerHTML = originalOptions.supplier;
                     if (pointSelect) pointSelect.innerHTML = originalOptions.point;
+                    if (supplierSelect) supplierSelect.innerHTML = originalOptions.supplier;
                     return;
                 }
                 
                 fetchAndUpdate(`/api/bread/${breadId}/associations`, [
                     { 
+                        select: pointSelect, 
+                        items: 'points', 
+                        label: 'Seleziona punto vendita', 
+                        type: 'point' 
+                    },
+                    { 
                         select: supplierSelect, 
                         items: 'suppliers', 
                         label: 'Seleziona fornitore', 
                         type: 'supplier' 
-                    },
-                    { 
-                        select: pointSelect, 
-                        items: 'points', 
-                        label: 'Seleziona punto vendita', 
-                        type: 'point' 
-                    }
-                ]);
-            });
-        }
-        if (supplierSelect) {
-            supplierSelect.addEventListener('change', function() {
-                const supplierId = this.value;
-                
-                if (!supplierId) {
-                    if (breadSelect) breadSelect.innerHTML = originalOptions.bread;
-                    if (pointSelect) pointSelect.innerHTML = originalOptions.point;
-                    return;
-                }
-                
-                fetchAndUpdate(`/api/supplier/${supplierId}/associations`, [
-                    { 
-                        select: breadSelect, 
-                        items: 'breads', 
-                        label: 'Seleziona tipo di pane', 
-                        type: 'bread' 
-                    },
-                    { 
-                        select: pointSelect, 
-                        items: 'points', 
-                        label: 'Seleziona punto vendita', 
-                        type: 'point' 
                     }
                 ]);
             });
@@ -269,7 +237,7 @@
                     { 
                         select: breadSelect, 
                         items: 'breads', 
-                        label: 'Seleziona tipo di pane', 
+                        label: 'Seleziona prodotto', 
                         type: 'bread' 
                     },
                     { 
@@ -277,6 +245,32 @@
                         items: 'suppliers', 
                         label: 'Seleziona fornitore', 
                         type: 'supplier' 
+                    }
+                ]);
+            });
+        }
+        if (supplierSelect) {
+            supplierSelect.addEventListener('change', function() {
+                const supplierId = this.value;
+                
+                if (!supplierId) {
+                    if (breadSelect) breadSelect.innerHTML = originalOptions.bread;
+                    if (pointSelect) pointSelect.innerHTML = originalOptions.point;
+                    return;
+                }
+                
+                fetchAndUpdate(`/api/supplier/${supplierId}/associations`, [
+                    { 
+                        select: breadSelect, 
+                        items: 'breads', 
+                        label: 'Seleziona prodotto', 
+                        type: 'bread' 
+                    },
+                    { 
+                        select: pointSelect, 
+                        items: 'points', 
+                        label: 'Seleziona punto vendita', 
+                        type: 'point' 
                     }
                 ]);
             });

@@ -4,19 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-class Delivery extends Model
+
+class ReturnDelivery extends Model
 {
     use HasFactory;
+    
+    protected $table = 'return_deliveries';
 
     protected $fillable = [
         'user_id',
         'bread_id',
-        'point_id',
         'supplier_id',
+        'point_id',
         'delivery_date',
         'quantity',
-        'unit',
         'expected_quantity',
+        'unit'
     ];
 
     public function bread()
@@ -24,19 +27,18 @@ class Delivery extends Model
         return $this->belongsTo(Bread::class);
     }
 
-    public function point()
-    {
-        return $this->belongsTo(Point::class);
-    }
-
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
     }
 
+    public function point()
+    {
+        return $this->belongsTo(Point::class);
+    }
+    
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-    
 }

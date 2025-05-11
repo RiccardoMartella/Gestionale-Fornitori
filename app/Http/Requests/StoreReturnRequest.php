@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreDeliveriesRequest extends FormRequest
+class StoreReturnRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -16,19 +16,16 @@ class StoreDeliveriesRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
             'bread_id' => 'required|exists:breads,id',
-            'point_id' => 'nullable|exists:points_of_sales,id',
-            'supplier_id' => 'nullable|exists:suppliers,id',
-            'delivery_date' => 'required|date',
-            'quantity' => 'required|numeric|min:0',
+            'supplier_id' => 'required|exists:suppliers,id',
+            'point_id' => 'required|exists:points_of_sales,id',
+            'quantity' => 'required|numeric|min:0.01',
             'unit' => 'required|string|in:kg,litri',
-            'expected_quantity' => 'required|numeric|min:0',
+            'delivery_date' => 'required|date',
         ];
     }
 }

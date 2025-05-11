@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSuppliersRequest;
 use App\Models\Supplier;
 use App\Models\Point;
+use App\Models\Delivery;
+use App\Models\ReturnDelivery;
 
 class SuppliersController extends Controller
 {
@@ -47,11 +49,23 @@ class SuppliersController extends Controller
     public function show(string $id)
     {
         $supplier = Supplier::findOrFail($id);
-        $breads = $supplier->breads; 
+        $breads = $supplier->breads;
+        
+        $recentDeliveries = Delivery::where('supplier_id', $id)
+                            ->orderBy('delivery_date', 'desc')
+                            ->take(10)
+                            ->get();
+                            
+        $recentReturns = ReturnDelivery::where('supplier_id', $id)
+                         ->orderBy('delivery_date', 'desc')
+                         ->take(10)
+                         ->get();
 
         return view('suppliers.show', [
             "supplier" => $supplier,
-            "breads" => $breads
+            "breads" => $breads,
+            "recentDeliveries" => $recentDeliveries,
+            "recentReturns" => $recentReturns
         ]);   
     }
 

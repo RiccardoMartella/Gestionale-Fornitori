@@ -86,7 +86,7 @@
                         </div>
                     </div>
                     
-                    <h2 class="text-xl font-semibold mb-3 text-gray-700 dark:text-gray-300">Tipi di Pane</h2>
+                    <h2 class="text-xl font-semibold mb-3 text-gray-700 dark:text-gray-300">Tipi di Prodotti</h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         @if($breads && $breads->count() > 0)
@@ -131,48 +131,97 @@
                         @endforelse
                     </div>
 
-                    <!-- Ultime consegne -->
-                    <div class="mt-8 border-t pt-6 border-gray-200 dark:border-gray-700">
-                        <h2 class="text-xl font-semibold mb-4 text-center">Ultime consegne</h2>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                <thead class="bg-gray-50 dark:bg-gray-700">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Punto Vendita</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tipo di Pane</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantità</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Data</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                    @if($supplier->deliveries && $supplier->deliveries->count() > 0)
-                                        @foreach($supplier->deliveries->sortByDesc('delivery_date')->take(5) as $delivery)
-                                            <tr>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    {{ $delivery->pointOfSale->name ?? 'N/A' }}
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    {{ $delivery->bread->name }}
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    {{ $delivery->quantity }} kg
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    {{ $delivery->delivery_date->format('d/m/Y') }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    @else
-                                        <tr>
-                                            <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center">
-                                                Nessuna consegna registrata
-                                            </td>
-                                        </tr>
-                                    @endif
-                                </tbody>
-                            </table>
+                    <!-- Ultime Consegne -->
+                    <section class="mb-10">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold">Ultime Consegne</h2>
+                         
                         </div>
-                    </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700">
+                            <div class="overflow-x-auto">
+                                @if(isset($recentDeliveries) && count($recentDeliveries) > 0)
+                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                        <thead class="bg-gray-50 dark:bg-gray-700">
+                                            <tr>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Data</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Prodotto</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Punto Vendita</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantità</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                            @foreach($recentDeliveries as $delivery)
+                                                <tr>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ date('d/m/Y', strtotime($delivery->delivery_date)) }}</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $delivery->bread->name }}</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                        @if($delivery->point)
+                                                            {{ $delivery->point->name }}
+                                                        @else
+                                                            N/D
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $delivery->quantity }} {{ $delivery->unit }}</td>
+                                              
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                @else
+                                    <div class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                        Nessuna consegna registrata per questo fornitore.
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Ultimi Resi -->
+                    <section class="mb-10">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-semibold">Ultimi Resi</h2>
+                         
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700">
+                            <div class="overflow-x-auto">
+                                @if(isset($recentReturns) && count($recentReturns) > 0)
+                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                        <thead class="bg-gray-50 dark:bg-gray-700">
+                                            <tr>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Data</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Prodotto</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Punto Vendita</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantità Restituita</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                            @foreach($recentReturns as $return)
+                                                <tr>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ date('d/m/Y', strtotime($return->delivery_date)) }}</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $return->bread->name }}</td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                        @if($return->point)
+                                                            {{ $return->point->name }}
+                                                        @else
+                                                            N/D
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $return->quantity }} {{ $return->unit }}</td>
+                                                 
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                @else
+                                    <div class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                        Nessun reso registrato per questo fornitore.
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>

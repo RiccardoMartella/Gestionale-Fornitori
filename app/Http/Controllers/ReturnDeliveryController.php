@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreDeliveriesRequest;
-use App\Models\Delivery;
+use App\Models\ReturnDelivery;
 use App\Models\Inventory;
+use App\Http\Requests\StoreReturnRequest;
 use App\Models\Bread;
 use App\Models\Supplier;
 use App\Models\Point;
 use Illuminate\Support\Facades\Log;
 
-class DeliveriesController extends Controller
+class ReturnDeliveryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index() {}
+    public function index()
+    {
+        $returns = ReturnDelivery::with(['bread', 'point'])->get();
+        return view('returns.index', ['returns' => $returns]);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -23,20 +27,22 @@ class DeliveriesController extends Controller
     public function create()
     {
         $breads = Bread::all();
-        $suppliers = Supplier::all();
+        $suppliers = Supplier::all(); 
         $pointOfSales = Point::all();
-
         $bread_id = request('bread_id');
+        $point_id = request('point_id');
         $supplier_id = request('supplier_id');
 
         $bread = $bread_id ? Bread::find($bread_id) : null;
+        $point = $point_id ? Point::find($point_id) : null;
         $supplier = $supplier_id ? Supplier::find($supplier_id) : null;
 
-        return view('deliveries.create', [
+        return view('returns.create', [
             'breads' => $breads,
             'suppliers' => $suppliers,
             'pointOfSales' => $pointOfSales,
             'bread' => $bread,
+            'point' => $point,
             'supplier' => $supplier
         ]);
     }
@@ -44,53 +50,56 @@ class DeliveriesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreDeliveriesRequest $request)
+    public function store(StoreReturnRequest $request)
     {
         $validated = $request->validated();
         $validated['user_id'] = auth()->id();
-        
+
         if (isset($validated['point_of_sale_id'])) {
             $validated['point_id'] = $validated['point_of_sale_id'];
             unset($validated['point_of_sale_id']);
         }
 
-       Delivery::create($validated);
+        $validated['unit'] = $validated['unit'] ?? 'kg';
+
+
+        $validated['expected_quantity'] = $validated['quantity'];
+        $validated['quantity'] = $validated['quantity'];
+        
+        ReturnDelivery::create($validated);
 
         $this->updateInventory(
             $validated['bread_id'],
-            $validated['point_id'] ?? null,
-            $validated['quantity'],
+            $validated['point_id'],
+            -$validated['quantity'], 
             $validated['unit']
         );
 
-        if (!empty($request->supplier_id)) {
-            return redirect()->route('dashboard.index', $request->supplier_id)
-                ->with('success', 'Consegna registrata con successo.');
-        }
-
-        $bread = Bread::find($request->bread_id);
-        return redirect()->route('breads.show', $bread->id)
-            ->with('success', 'Consegna registrata con successo.');
+        return redirect()->route('dashboard.index')->with('success', 'Reso registrato con successo.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id) {}
+    public function show(string $id)
+    {
+        $return = ReturnDelivery::findOrFail($id);
+        return view('returns.show', compact('return'));
+    }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        $delivery = Delivery::findOrFail($id);
-        $bread = Bread::findOrFail($delivery->bread_id);
+        $return = ReturnDelivery::findOrFail($id);
+        $bread = Bread::findOrFail($return->bread_id);
         $breads = Bread::all();
         $suppliers = Supplier::all();
         $pointOfSales = Point::all();
 
-        return view('deliveries.edit', [
-            'delivery' => $delivery,
+        return view('returns.edit', [
+            'return' => $return,
             'bread' => $bread,
             'breads' => $breads,
             'suppliers' => $suppliers,
@@ -101,34 +110,36 @@ class DeliveriesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreDeliveriesRequest $request, string $id)
+    public function update(StoreReturnRequest $request, string $id)
     {
         $validated = $request->validated();
         $validated['user_id'] = auth()->id();
-        
-        $delivery = Delivery::findOrFail($id);
-        
-        $oldQuantity = $delivery->quantity;
-        $oldUnit = $delivery->unit;
-        
-        $delivery->update($validated);
-        
+
+        $return = ReturnDelivery::findOrFail($id);
+
+        $oldQuantity = $return->quantity;
+        $oldUnit = $return->unit;
+
+        $validated['expected_quantity'] = $validated['quantity'];
+        $validated['quantity'] = $validated['quantity']; 
+
+        $return->update($validated);
+
         $this->updateInventory(
-            $delivery->bread_id,
-            $delivery->point_id,
-            -$oldQuantity,
+            $return->bread_id,
+            $return->point_id,
+            $oldQuantity, 
             $oldUnit
         );
-        
+
         $this->updateInventory(
             $validated['bread_id'],
-            $validated['point_id'] ?? $delivery->point_id,
-            $validated['quantity'],
+            $validated['point_id'] ?? $return->point_id,
+            -$validated['quantity'], 
             $validated['unit']
         );
-        
-        $bread = Bread::findOrFail($delivery->bread_id);
-        return redirect()->route('dashboard.index', $bread->id)->with('success', 'Consegna aggiornata con successo.');
+
+        return redirect()->route('dashboard.index')->with('success', 'Reso aggiornato con successo.');
     }
 
     /**
@@ -137,29 +148,30 @@ class DeliveriesController extends Controller
     public function destroy(string $id)
     {
         try {
-            $delivery = Delivery::findOrFail($id);
-            $breadId = $delivery->bread_id;
-            
-            $this->updateInventory(
-                $delivery->bread_id,
-                $delivery->point_id,
-                -$delivery->quantity,
-                $delivery->unit
-            );
-            
-            $delivery->delete();
+            $return = ReturnDelivery::findOrFail($id);
 
-            return redirect()->route('dashboard.index', $breadId)->with('success', 'Consegna eliminata con successo.');
+            $this->updateInventory(
+                $return->bread_id,
+                $return->point_id,
+                -$return->quantity,
+                $return->unit
+            );
+
+            $return->delete();
+
+            Log::info('Reso eliminato con successo', ['return_id' => $id]);
+
+            return redirect()->route('dashboard.index')->with('success', 'Reso eliminato con successo.');
         } catch (\Exception $e) {
-            Log::error('Errore eliminazione consegna', [
-                'delivery_id' => $id,
+            Log::error('Errore eliminazione reso', [
+                'return_id' => $id,
                 'error' => $e->getMessage()
             ]);
 
-            return back()->with('error', 'Errore durante l\'eliminazione della consegna: ' . $e->getMessage());
+            return back()->with('error', 'Errore durante l\'eliminazione del reso: ' . $e->getMessage());
         }
     }
- 
+
     private function updateInventory($breadId, $pointId, $quantity, $unit)
     {
         if ($pointId) {
@@ -168,13 +180,15 @@ class DeliveriesController extends Controller
                 'point_id' => $pointId,
                 'unit' => $unit
             ]);
-            
+
             if (!$inventory->exists) {
                 $inventory->quantity = 0;
                 $inventory->unit = $unit;
             }
-            
-            $inventory->incrementInventory($quantity); 
+
+            $inventory->quantity += $quantity;
+            $inventory->save();
+
         }
     }
 }

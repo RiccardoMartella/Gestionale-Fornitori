@@ -16,6 +16,8 @@
         
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
         
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
@@ -38,6 +40,20 @@
             <main>
                 {{ $slot }}
             </main>
+            
+            <!-- Footer -->
+            <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 mt-8">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center items-center">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Powered by 
+                        <a href="https://www.linkedin.com/in/riccardo-martella-b91854252/" 
+                           class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                           target="_blank" rel="noopener noreferrer">
+                            Riccardo Martella
+                        </a>
+                    </p>
+                </div>
+            </footer>
         </div>
     </body>
 </html>

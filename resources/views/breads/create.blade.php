@@ -14,11 +14,11 @@
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                             </svg>
-                            Torna alla lista dei pani
+                            Torna alla lista dei Prodotti
                         </a>
                         
                         <h1 class="text-center text-2xl font-bold mb-6 pb-2 border-b-2 border-orange-400 inline-block">
-                            Aggiungi Nuovo Pane
+                            Aggiungi Nuovo Prodotti
                         </h1>
                         
                       
@@ -49,7 +49,7 @@
                             </div>
                             <div class="pt-4 flex justify-center">
                                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200">
-                                    Aggiungi Pane
+                                    Aggiungi Prodotti
                                 </button>
                             </div>
                         </form>
