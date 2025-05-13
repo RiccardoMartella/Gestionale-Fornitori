@@ -73,11 +73,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="expected_quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantità prevista</label>
-                            <input type="number" name="expected_quantity" id="expected_quantity" class="form-input" required>
+                            <input type="number" step="0.01" name="expected_quantity" id="expected_quantity" class="form-input" required>
                         </div>
                         <div>
                             <label for="quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantità effettiva</label>
-                            <input type="number" name="quantity" id="quantity" class="form-input" required>
+                            <input type="number" step="0.01" name="quantity" id="quantity" class="form-input" required>
                         </div>
                     </div>
 

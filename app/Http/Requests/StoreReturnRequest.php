@@ -23,7 +23,7 @@ class StoreReturnRequest extends FormRequest
             'bread_id' => 'required|exists:breads,id',
             'supplier_id' => 'required|exists:suppliers,id',
             'point_id' => 'required|exists:points_of_sales,id',
-            'quantity' => 'required|numeric|min:0.01',
+            'quantity' => 'required|numeric|min:0',
             'unit' => 'required|string|in:kg,litri',
             'delivery_date' => 'required|date',
         ];
