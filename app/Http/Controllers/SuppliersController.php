@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSuppliersRequest;
 use App\Models\Supplier;
 use App\Models\Point;
+use Illuminate\Support\Facades\DB;
 use App\Models\Delivery;
 use App\Models\ReturnDelivery;
+use Illuminate\Http\Request;
 
 class SuppliersController extends Controller
 {
@@ -46,26 +48,101 @@ class SuppliersController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id, Request $request)
     {
         $supplier = Supplier::findOrFail($id);
         $breads = $supplier->breads;
         
-        $recentDeliveries = Delivery::where('supplier_id', $id)
-                            ->orderBy('delivery_date', 'desc')
+        $selectedMonth = $request->get('month', date('m'));
+        $selectedYear = $request->get('year', date('Y'));
+        
+        $baseDeliveriesQuery = Delivery::where('supplier_id', $id);
+        $baseReturnsQuery = ReturnDelivery::where('supplier_id', $id);
+        
+        if ($selectedMonth && $selectedMonth != 'all') {
+            $baseDeliveriesQuery->whereMonth('delivery_date', $selectedMonth)
+                            ->whereYear('delivery_date', $selectedYear);
+            $baseReturnsQuery->whereMonth('delivery_date', $selectedMonth)
+                        ->whereYear('delivery_date', $selectedYear);
+        }
+        
+        $recentDeliveries = (clone $baseDeliveriesQuery)->orderBy('delivery_date', 'desc')
                             ->take(10)
                             ->get();
                             
-        $recentReturns = ReturnDelivery::where('supplier_id', $id)
-                         ->orderBy('delivery_date', 'desc')
+        $recentReturns = (clone $baseReturnsQuery)->orderBy('delivery_date', 'desc')
                          ->take(10)
                          ->get();
+
+        $productReports = [];
+        
+        $deliveriesByProduct = (clone $baseDeliveriesQuery)
+                             ->select('bread_id', 'unit', DB::raw('SUM(quantity) as total_quantity'))
+                             ->groupBy('bread_id', 'unit')
+                             ->get();
+        
+        $returnsByProduct = (clone $baseReturnsQuery)
+                          ->select('bread_id', 'unit', DB::raw('SUM(quantity) as total_quantity'))
+                          ->groupBy('bread_id', 'unit')
+                          ->get();
+        
+        foreach ($deliveriesByProduct as $delivery) {
+            if (!isset($productReports[$delivery->bread_id])) {
+                $productReports[$delivery->bread_id] = [
+                    'name' => $delivery->bread->name,
+                    'deliveries_kg' => 0,
+                    'returns_kg' => 0,
+                    'deliveries_litri' => 0,
+                    'returns_litri' => 0,
+                ];
+            }
+            
+            if ($delivery->unit == 'kg') {
+                $productReports[$delivery->bread_id]['deliveries_kg'] = $delivery->total_quantity;
+            } else if ($delivery->unit == 'litri') {
+                $productReports[$delivery->bread_id]['deliveries_litri'] = $delivery->total_quantity;
+            }
+        }
+        
+        foreach ($returnsByProduct as $return) {
+            if (!isset($productReports[$return->bread_id])) {
+                $productReports[$return->bread_id] = [
+                    'name' => $return->bread->name,
+                    'deliveries_kg' => 0,
+                    'returns_kg' => 0,
+                    'deliveries_litri' => 0,
+                    'returns_litri' => 0,
+                ];
+            }
+            
+            if ($return->unit == 'kg') {
+                $productReports[$return->bread_id]['returns_kg'] = $return->total_quantity;
+            } else if ($return->unit == 'litri') {
+                $productReports[$return->bread_id]['returns_litri'] = $return->total_quantity;
+            }
+        }
+        
+        $totalDeliveriesLitri = (clone $baseDeliveriesQuery)->where('unit', 'litri')->sum('quantity');
+        $totalReturnsLitri = (clone $baseReturnsQuery)->where('unit', 'litri')->sum('quantity');
+        $totalDeliveriesKg = (clone $baseDeliveriesQuery)->where('unit', 'kg')->sum('quantity');
+        $totalReturnsKg = (clone $baseReturnsQuery)->where('unit', 'kg')->sum('quantity');
+        $balanceLitri = $totalDeliveriesLitri - $totalReturnsLitri;
+        $balanceKg = $totalDeliveriesKg - $totalReturnsKg;
 
         return view('suppliers.show', [
             "supplier" => $supplier,
             "breads" => $breads,
             "recentDeliveries" => $recentDeliveries,
-            "recentReturns" => $recentReturns
+            "recentReturns" => $recentReturns,
+            "totalDeliveriesLitri" => $totalDeliveriesLitri,
+            "totalReturnsLitri" => $totalReturnsLitri,
+            "balanceLitri" => $balanceLitri,
+            "totalDeliveriesKg" => $totalDeliveriesKg,
+            "totalReturnsKg" => $totalReturnsKg,
+            "balanceKg" => $balanceKg,
+            "selectedMonth" => $selectedMonth,
+            "selectedYear" => $selectedYear,
+            "productReports" => $productReports
         ]);   
     }
 
