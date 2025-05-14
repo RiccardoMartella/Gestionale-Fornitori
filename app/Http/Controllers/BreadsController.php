@@ -78,8 +78,12 @@ class BreadsController extends Controller
         $validated = $request->validated();
         $bread = Bread::find($id);
         $bread->update($validated);
+        
+        if (isset($validated['suppliers'])) {
+            $bread->suppliers()->sync($validated['suppliers']);
+        }
 
-        return redirect()->route('dashboard.index', $bread->id);
+        return redirect()->route('dashboard.index')->with('success', 'Pane aggiornato con successo!');
     }
 
     /**

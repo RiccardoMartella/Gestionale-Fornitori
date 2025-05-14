@@ -218,15 +218,15 @@
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ date('d/m/Y', strtotime($delivery->delivery_date)) }}</td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $delivery->bread->name }}</td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        @if($delivery->bread->suppliers->isNotEmpty() && $delivery->bread->suppliers->first()->pointOfSales->isNotEmpty())
-                                                            {{ $delivery->bread->suppliers->first()->pointOfSales->first()->name }}
+                                                        @if($delivery->point)
+                                                            {{ $delivery->point->name }}
                                                         @else
                                                             N/D
                                                         @endif
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        @if($delivery->bread->suppliers->isNotEmpty())
-                                                            {{ $delivery->bread->suppliers->first()->name }}
+                                                        @if($delivery->supplier)
+                                                            {{ $delivery->supplier->name }}
                                                         @else
                                                             N/D
                                                         @endif

@@ -55,9 +55,24 @@ class SuppliersController extends Controller
         
         $selectedMonth = $request->get('month', date('m'));
         $selectedYear = $request->get('year', date('Y'));
+        $pointId = $request->get('point_id');
+        
+        $point = null;
+        if ($pointId) {
+            $point = Point::find($pointId);
+            if (!$point || !$supplier->pointOfSales->contains($point->id)) {
+                $pointId = null;
+                $point = null;
+            }
+        }
         
         $baseDeliveriesQuery = Delivery::where('supplier_id', $id);
         $baseReturnsQuery = ReturnDelivery::where('supplier_id', $id);
+        
+        if ($pointId) {
+            $baseDeliveriesQuery->where('point_id', $pointId);
+            $baseReturnsQuery->where('point_id', $pointId);
+        }
         
         if ($selectedMonth && $selectedMonth != 'all') {
             $baseDeliveriesQuery->whereMonth('delivery_date', $selectedMonth)
@@ -142,7 +157,9 @@ class SuppliersController extends Controller
             "balanceKg" => $balanceKg,
             "selectedMonth" => $selectedMonth,
             "selectedYear" => $selectedYear,
-            "productReports" => $productReports
+            "productReports" => $productReports,
+            "pointId" => $pointId,
+            "point" => $point
         ]);   
     }
 

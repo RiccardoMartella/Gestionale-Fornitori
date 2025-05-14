@@ -73,7 +73,7 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         @forelse ($point->suppliers as $supplier)
-                            <a href="{{ route('suppliers.show', $supplier->id) }}" 
+                            <a href="{{ route('suppliers.show', ['supplier' => $supplier->id, 'point_id' => $point->id]) }}" 
                                class="flex items-center p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
                                 <div class="flex-shrink-0 mr-4">
                                     <div class="h-12 w-12 bg-blue-100 dark:bg-blue-700 rounded-full flex items-center justify-center">

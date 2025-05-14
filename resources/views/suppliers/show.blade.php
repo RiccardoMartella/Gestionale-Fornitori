@@ -18,7 +18,14 @@
                         </a>
                     </div>
                 
-                    <h1 class="text-2xl font-bold mb-6 text-center  border-gray-200 dark:border-gray-700 pb-4">{{$supplier->name}}</h1>
+                    <h1 class="text-2xl font-bold mb-6 text-center border-gray-200 dark:border-gray-700 pb-4">
+                        {{$supplier->name}}
+                        @if(isset($point))
+                            <span class="text-lg text-gray-600 dark:text-gray-400 block mt-1">
+                                Dati filtrati per punto vendita: {{ $point->name }}
+                            </span>
+                        @endif
+                    </h1>
                     
                     <!-- Dettagli Fornitore -->
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700 mb-8">
@@ -136,9 +143,12 @@
                         <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
                             <h2 class="text-xl font-semibold mb-4 md:mb-0">Ultime Consegne</h2>
                             
-                            <!-- Filtro per mese migliorato -->
                             <div class="bg-white dark:bg-gray-700 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
                                 <form action="{{ route('suppliers.show', $supplier->id) }}" method="GET" class="flex flex-wrap items-center gap-4">
+                                    @if(isset($pointId))
+                                        <input type="hidden" name="point_id" value="{{ $pointId }}">
+                                    @endif
+                                    
                                     <div class="flex items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -180,7 +190,7 @@
                                 </form>
                             </div>
                         </div>
-                        
+                 
                         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-700">
                             @if(isset($recentDeliveries) && count($recentDeliveries) > 0)
                                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
