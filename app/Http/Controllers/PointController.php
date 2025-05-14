@@ -113,7 +113,7 @@ class PointController extends Controller
         $monthlyTotalsKg = array_slice($monthlyTotalsKg, 0, $currentMonth);
         $monthlyTotalsLitri = array_slice($monthlyTotalsLitri, 0, $currentMonth);
 
-        return view('points.show', compact('point', 'inventoryData', 'monthlyTotalsKg', 'monthlyTotalsLitri'));
+        return view('points.show', ['point' => $point , 'inventoryData' => $inventoryData , 'monthlyTotalsKg' => $monthlyTotalsKg , 'monthlyTotalsLitri'=> $monthlyTotalsLitri]);
     }
 
     /**

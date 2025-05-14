@@ -36,7 +36,7 @@
                                     </div>
                                     <h3 class="text-xl font-semibold text-center text-gray-800 dark:text-white mb-2">{{ $supplier->name }}</h3>
                                     <div class="flex justify-between text-sm text-gray-500 dark:text-gray-300">
-                                        <span>{{ $supplier->bread ? $supplier->bread->count() : 0 }} tipi pane</span>
+                                        <span>{{ $supplier->breads ? $supplier->breads->count() : 0 }} prodotti</span>
                                         <span>{{ $supplier->pointOfSales ? $supplier->pointOfSales->count() : 0 }} punti vendita</span>
                                     </div>
                                 </div>

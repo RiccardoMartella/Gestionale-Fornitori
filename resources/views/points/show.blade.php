@@ -85,7 +85,7 @@
                                 <div class="flex-1">
                                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white">{{ $supplier->name }}</h3>
                                     <p class="text-sm text-gray-500 dark:text-gray-300">
-                                        {{ $supplier->breads && $supplier->breads->count() > 0 ? $supplier->breads->count() . ' tipi di pane' : 'Nessun tipo di pane' }}
+                                        {{ $supplier->breads && $supplier->breads->count() > 0 ? $supplier->breads->count() . ' prodotti ' : 'Nessun tipo di prodotto' }}
                                     </p>
                                 </div>
                             </a>
