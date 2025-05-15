@@ -37,9 +37,7 @@ class BreadsController extends Controller
     {
         $validated = $request->validated();
         
-        $bread = Bread::create([
-            'name' => $validated['name']
-        ]);
+        $bread = Bread::create($validated);
         if (isset($validated['suppliers'])) {
             $bread->suppliers()->sync($validated['suppliers']);
         }

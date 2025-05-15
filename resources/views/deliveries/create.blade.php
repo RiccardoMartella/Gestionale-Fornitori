@@ -15,15 +15,37 @@
                         Torna indietro
                     </a>
                 </div>
-
+                
                 <h1 class="text-2xl font-bold mb-6 text-center border-b border-gray-200 pb-4 text-white dark:border-gray-700">
                     Nuova Consegna
                 </h1>
-
+                
                 <form action="{{ route('deliveries.store') }}" method="POST" class="space-y-6">
                     @csrf
                     @method('POST')
-
+                    
+                    <div class="mb-4">
+                        <label for="point_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Punto Vendita</label>
+                        <select name="point_id" id="point_of_sale_id" class="form-select" required>
+                            <option value="">-- Seleziona punto vendita --</option>
+                            @foreach($pointOfSales as $point)
+                                <option value="{{ $point->id }}">{{ $point->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @if(isset($supplier))
+                        <input type="hidden" name="supplier_id" value="{{ $supplier->id }}">
+                    @else
+                        <div class="mb-4">
+                            <label for="supplier_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fornitore</label>
+                            <select name="supplier_id" id="supplier_id" class="form-select" required>
+                                <option value="">-- Seleziona fornitore --</option>
+                                @foreach($suppliers as $supplier)
+                                    <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
                     @if(isset($bread))
                         <input type="hidden" name="bread_id" value="{{ $bread->id }}">
                     @else
@@ -38,29 +60,7 @@
                         </div>
                     @endif
 
-                    @if(isset($supplier))
-                        <input type="hidden" name="supplier_id" value="{{ $supplier->id }}">
-                    @else
-                        <div class="mb-4">
-                            <label for="supplier_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fornitore</label>
-                            <select name="supplier_id" id="supplier_id" class="form-select" required>
-                                <option value="">-- Seleziona fornitore --</option>
-                                @foreach($suppliers as $supplier)
-                                    <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    @endif
 
-                    <div class="mb-4">
-                        <label for="point_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Punto Vendita</label>
-                        <select name="point_id" id="point_of_sale_id" class="form-select" required>
-                            <option value="">-- Seleziona punto vendita --</option>
-                            @foreach($pointOfSales as $point)
-                                <option value="{{ $point->id }}">{{ $point->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
 
                     <div>
                         <label for="unit" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Unità di misura</label>
