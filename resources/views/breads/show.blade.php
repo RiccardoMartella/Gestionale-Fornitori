@@ -48,17 +48,157 @@
                         </div>
                     </div>
                     
-                    
-                    {{-- <!-- Pulsante per creare nuova consegna -->
-                    <div class="mb-8 text-center">
-                        <a href="{{ route('deliveries.create', ['bread_id' => $bread->id]) }}" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200">
-                            Crea nuova consegna
-                        </a>
-                    </div> --}}
+                    <!-- Filtro per punto vendita -->
+                    <div class="mb-8">
+                        <form method="GET" action="{{ route('breads.show', $bread->id) }}" class="flex flex-col sm:flex-row gap-4 items-end">
+                            <div class="flex-grow">
+                                <label for="point_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filtra per punto vendita</label>
+                                <select name="point_id" id="point_id" class="w-full border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white">
+                                    <option value="">Tutti i punti vendita</option>
+                                    @foreach($allPoints as $pointOption)
+                                        <option value="{{ $pointOption->id }}" {{ request('point_id') == $pointOption->id ? 'selected' : '' }}>
+                                            {{ $pointOption->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 h-10">
+                                Filtra
+                            </button>
+                            @if(request('point_id'))
+                                <a href="{{ route('breads.show', $bread->id) }}" class="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 h-10 flex items-center">
+                                    Rimuovi filtro
+                                </a>
+                            @endif
+                        </form>
+                    </div>
 
+                    @if(isset($point))
+                        <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-800 rounded-lg">
+                            <h3 class="font-semibold text-lg text-blue-800 dark:text-blue-200">
+                                Dati filtrati per: {{ $point->name }}
+                            </h3>
+                        </div>
+                    @endif
+
+                    <!-- Consegne -->
                     <div class="mt-8 border-t pt-6 border-gray-200 dark:border-gray-700">
                         <h2 class="text-xl font-semibold mb-4 text-center">Storico consegne</h2>
-                        @include('deliveries.index')
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Data</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Punto Vendita</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Fornitore</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantità</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    @forelse($deliveries as $delivery)
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ date('d/m/Y', strtotime($delivery->delivery_date)) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                @if($delivery->point)
+                                                    {{ $delivery->point->name }}
+                                                @else
+                                                    N/D
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                @if($delivery->supplier)
+                                                    {{ $delivery->supplier->name }}
+                                                @else
+                                                    N/D
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $delivery->quantity }} {{$delivery->unit}}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <a href="{{ route('deliveries.edit', $delivery->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">Modifica</a>
+                                                <form action="{{ route('deliveries.destroy', $delivery->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200" 
+                                                        onclick="return confirm('Sei sicuro di voler eliminare questa consegna?')">
+                                                        Elimina
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                                Nessuna consegna trovata
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                            <div class="mt-4 px-6 py-3">
+                                {{ $deliveries->appends(['returns_page' => request('returns_page'), 'point_id' => request('point_id')])->links() }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resi -->
+                    <div class="mt-8 border-t pt-6 border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-semibold mb-4 text-center">Storico resi</h2>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Data</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Punto Vendita</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Fornitore</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantità</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    @forelse($returns as $return)
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ date('d/m/Y', strtotime($return->delivery_date)) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                @if($return->point)
+                                                    {{ $return->point->name }}
+                                                @else
+                                                    N/D
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                @if($return->supplier)
+                                                    {{ $return->supplier->name }}
+                                                @else
+                                                    N/D
+                                                @endif
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $return->quantity }} {{$return->unit}}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <a href="{{ route('returns.edit', $return->id) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">Modifica</a>
+                                                <form action="{{ route('returns.destroy', $return->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200" 
+                                                        onclick="return confirm('Sei sicuro di voler eliminare questo reso?')">
+                                                        Elimina
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                                Nessun reso trovato
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                            <div class="mt-4 px-6 py-3">
+                                {{ $returns->appends(['deliveries_page' => request('deliveries_page'), 'point_id' => request('point_id')])->links() }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

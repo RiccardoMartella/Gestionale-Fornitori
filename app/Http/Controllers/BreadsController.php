@@ -6,6 +6,8 @@ use App\Models\Bread;
 use App\Models\Supplier;
 use App\Http\Requests\StoreBreadsRequest;
 use App\Models\Delivery;
+use App\Models\Point;
+use App\Models\ReturnDelivery;
 use Illuminate\Validation\ValidationException;
 
 class BreadsController extends Controller
@@ -52,9 +54,42 @@ class BreadsController extends Controller
     public function show(string $id)
     {
         $bread = Bread::with('suppliers')->findOrFail($id);
-        $deliveries = $bread->deliveries;
-  
-        return view('breads.show', ["bread" => $bread, "deliveries" => $deliveries]);
+        $pointId = request('point_id');
+        $point = null;
+        
+        if ($pointId) {
+            $point = \App\Models\Point::find($pointId);
+        }
+        
+        $deliveriesQuery = Delivery::where('bread_id', $id)
+            ->with(['supplier', 'point']);
+        
+        $returnsQuery = ReturnDelivery::where('bread_id', $id)
+            ->with(['supplier', 'point']);
+        
+        if ($pointId) {
+            $deliveriesQuery->where('point_id', $pointId);
+            $returnsQuery->where('point_id', $pointId);
+        }
+        
+        $deliveries = $deliveriesQuery->orderBy('created_at', 'desc')
+            ->orderBy('delivery_date', 'desc')
+            ->paginate(10, ['*'], 'deliveries_page');
+        
+        $returns = $returnsQuery->orderBy('created_at', 'desc')
+            ->orderBy('delivery_date', 'desc')
+            ->paginate(10, ['*'], 'returns_page');
+        
+        $allPoints = Point::all();
+
+        return view('breads.show', [
+            "bread" => $bread, 
+            "deliveries" => $deliveries,
+            "returns" => $returns,
+            "point" => $point,
+            "pointId" => $pointId,
+            "allPoints" => $allPoints
+        ]);
     }
 
     /**

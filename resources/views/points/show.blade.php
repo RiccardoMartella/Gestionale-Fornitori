@@ -22,7 +22,7 @@
                     
                     <div class="mb-10">
                         <h2 class="text-xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Stato Inventario</h2>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <div class="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6">
                                 <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-white">Inventario in Chilogrammi</h3>
                                 <div class="relative" style="height: 300px;">
@@ -37,7 +37,14 @@
                                 </div>
                             </div>
                             
-                            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6 col-span-1 lg:col-span-2">
+                            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6">
+                                <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-white">Inventario in Pezzi</h3>
+                                <div class="relative" style="height: 300px;">
+                                    <canvas id="pzInventoryChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6 col-span-1 lg:col-span-3">
                                 <h3 class="text-lg font-medium mb-4 text-gray-800 dark:text-white">Andamento Inventario</h3>
                                 <div class="relative" style="height: 300px;">
                                     <canvas id="inventoryTrendChart"></canvas>
@@ -115,6 +122,7 @@
             
             const kgProducts = inventoryData.filter(item => item.unit === 'kg');
             const litriProducts = inventoryData.filter(item => item.unit === 'litri');
+            const pzProducts = inventoryData.filter(item => item.unit === 'pz');
             
             if (kgProducts.length > 0) {
                 const kgCtx = document.getElementById('kgInventoryChart').getContext('2d');
@@ -216,6 +224,56 @@
                     '</div>';
             }
             
+            if (pzProducts.length > 0) {
+                const pzCtx = document.getElementById('pzInventoryChart').getContext('2d');
+                new Chart(pzCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: pzProducts.map(product => product.name),
+                        datasets: [{
+                            label: 'Quantità (pezzi)',
+                            data: pzProducts.map(product => product.quantity),
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.7)',
+                                'rgba(255, 99, 132, 0.7)',
+                                'rgba(54, 162, 235, 0.7)',
+                                'rgba(255, 206, 86, 0.7)',
+                                'rgba(153, 102, 255, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Pezzi'
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('pzInventoryChart').parentNode.innerHTML = 
+                    '<div class="flex flex-col items-center justify-center h-full">' +
+                        '<svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 005.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />' +
+                        '</svg>' +
+                        '<p class="text-gray-500 text-center">Nessun prodotto in pezzi in inventario</p>' +
+                    '</div>';
+            }
+            
             const trendCtx = document.getElementById('inventoryTrendChart').getContext('2d');
             new Chart(trendCtx, {
                 type: 'line',
@@ -235,6 +293,14 @@
                             data: @json($monthlyTotalsLitri ?? array_fill(0, 12, 0)),
                             borderColor: 'rgba(255, 159, 64, 1)',
                             backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Totale in Pezzi',
+                            data: @json($monthlyTotalsPz ?? array_fill(0, 12, 0)),
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
                             tension: 0.4,
                             fill: true
                         }
