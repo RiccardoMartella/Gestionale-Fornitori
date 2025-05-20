@@ -24,7 +24,7 @@ class StoreReturnRequest extends FormRequest
             'supplier_id' => 'required|exists:suppliers,id',
             'point_id' => 'required|exists:points_of_sales,id',
             'quantity' => 'required|numeric|min:0',
-            'unit' => 'required|string|in:kg,litri',
+            'unit' => ['required', 'string', 'in:kg,litri,pz'],
             'delivery_date' => 'required|date',
         ];
     }

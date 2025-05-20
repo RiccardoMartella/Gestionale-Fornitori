@@ -33,6 +33,7 @@
                                 <select id="unit" name="unit" class="w-full border border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white" required>
                                     <option value="kg" {{ $return->unit == 'kg' ? 'selected' : '' }}>kg</option>
                                     <option value="litri" {{ $return->unit == 'litri' ? 'selected' : '' }}>litri</option>
+                                    <option value="pz" {{ $return->unit == 'pz' ? 'selected' : '' }}>pezzi</option>
                                 </select>
                             </div>
 

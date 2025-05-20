@@ -67,6 +67,7 @@
                         <select name="unit" id="unit" class="form-select">
                             <option value="kg">kg</option>
                             <option value="litri">litri</option>
+                            <option value="pz">pezzi</option>
                         </select>
                     </div>
 

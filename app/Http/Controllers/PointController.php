@@ -92,10 +92,28 @@ class PointController extends Controller
             ->pluck('total', 'month')
             ->toArray();
             
+        $monthlyDeliveriesPz = Delivery::where('point_id', $point->id)
+            ->whereYear('delivery_date', $year)
+            ->where('unit', 'pz')
+            ->select(DB::raw('MONTH(delivery_date) as month'), DB::raw('SUM(quantity) as total'))
+            ->groupBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
+            
+        $monthlyReturnsPz = ReturnDelivery::where('point_id', $point->id)
+            ->whereYear('delivery_date', $year)
+            ->where('unit', 'pz')
+            ->select(DB::raw('MONTH(delivery_date) as month'), DB::raw('SUM(quantity) as total'))
+            ->groupBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
+            
         $monthlyTotalsKg = [];
         $monthlyTotalsLitri = [];
+        $monthlyTotalsPz = [];
         $runningTotalKg = 0;
         $runningTotalLitri = 0;
+        $runningTotalPz = 0;
         
         for ($month = 1; $month <= 12; $month++) {
             $deliveryTotal = $monthlyDeliveriesKg[$month] ?? 0;
@@ -107,13 +125,25 @@ class PointController extends Controller
             $returnTotalLitri = $monthlyReturnsLitri[$month] ?? 0;
             $runningTotalLitri += $deliveryTotalLitri - $returnTotalLitri;
             $monthlyTotalsLitri[$month - 1] = $runningTotalLitri;
+            
+            $deliveryTotalPz = $monthlyDeliveriesPz[$month] ?? 0;
+            $returnTotalPz = $monthlyReturnsPz[$month] ?? 0;
+            $runningTotalPz += $deliveryTotalPz - $returnTotalPz;
+            $monthlyTotalsPz[$month - 1] = $runningTotalPz;
         }
         
         $currentMonth = Carbon::now()->month;
         $monthlyTotalsKg = array_slice($monthlyTotalsKg, 0, $currentMonth);
         $monthlyTotalsLitri = array_slice($monthlyTotalsLitri, 0, $currentMonth);
+        $monthlyTotalsPz = array_slice($monthlyTotalsPz, 0, $currentMonth);
 
-        return view('points.show', ['point' => $point , 'inventoryData' => $inventoryData , 'monthlyTotalsKg' => $monthlyTotalsKg , 'monthlyTotalsLitri'=> $monthlyTotalsLitri]);
+        return view('points.show', [
+            'point' => $point, 
+            'inventoryData' => $inventoryData, 
+            'monthlyTotalsKg' => $monthlyTotalsKg, 
+            'monthlyTotalsLitri' => $monthlyTotalsLitri,
+            'monthlyTotalsPz' => $monthlyTotalsPz
+        ]);
     }
 
     /**

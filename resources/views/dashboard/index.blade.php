@@ -213,7 +213,7 @@
                                             </tr>
                                         </thead>
                                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                            @foreach($deliveries->sortByDesc('delivery_date')->take(10) as $delivery)
+                                            @foreach($deliveries as $delivery)
                                                 <tr>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ date('d/m/Y', strtotime($delivery->delivery_date)) }}</td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $delivery->bread->name }}</td>
@@ -248,6 +248,9 @@
                                             @endforeach
                                         </tbody>
                                     </table>
+                                    <div class="mt-4 px-6 py-3">
+                                        {{ $deliveries->links() }}
+                                    </div>
                                 @else
                                     <div class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                         Nessuna consegna registrata.
@@ -284,7 +287,7 @@
                                             </tr>
                                         </thead>
                                         <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                            @foreach($returns->sortByDesc('delivery_date')->take(10) as $return)
+                                            @foreach($returns as $return)
                                                 <tr>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ date('d/m/Y', strtotime($return->delivery_date)) }}</td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ $return->bread->name }}</td>
@@ -318,6 +321,9 @@
                                             @endforeach
                                         </tbody>
                                     </table>
+                                    <div class="mt-4 px-6 py-3">
+                                        {{ $returns->links() }}
+                                    </div>
                                 @else
                                     <div class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                         Nessun reso registrato.

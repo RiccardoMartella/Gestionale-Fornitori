@@ -27,7 +27,7 @@ class StoreDeliveriesRequest extends FormRequest
             'supplier_id' => 'nullable|exists:suppliers,id',
             'delivery_date' => 'required|date',
             'quantity' => 'required|numeric|min:0',
-            'unit' => 'required|string|in:kg,litri',
+            'unit' => ['required', 'string', 'in:kg,litri,pz'],
             'expected_quantity' => 'required|numeric|min:0',
         ];
     }

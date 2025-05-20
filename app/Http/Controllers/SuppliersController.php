@@ -109,6 +109,8 @@ class SuppliersController extends Controller
                     'returns_kg' => 0,
                     'deliveries_litri' => 0,
                     'returns_litri' => 0,
+                    'deliveries_pz' => 0,
+                    'returns_pz' => 0,
                 ];
             }
             
@@ -116,6 +118,8 @@ class SuppliersController extends Controller
                 $productReports[$delivery->bread_id]['deliveries_kg'] = $delivery->total_quantity;
             } else if ($delivery->unit == 'litri') {
                 $productReports[$delivery->bread_id]['deliveries_litri'] = $delivery->total_quantity;
+            } else if ($delivery->unit == 'pz') {
+                $productReports[$delivery->bread_id]['deliveries_pz'] = $delivery->total_quantity;
             }
         }
         
@@ -127,6 +131,8 @@ class SuppliersController extends Controller
                     'returns_kg' => 0,
                     'deliveries_litri' => 0,
                     'returns_litri' => 0,
+                    'deliveries_pz' => 0,
+                    'returns_pz' => 0,
                 ];
             }
             
@@ -134,6 +140,8 @@ class SuppliersController extends Controller
                 $productReports[$return->bread_id]['returns_kg'] = $return->total_quantity;
             } else if ($return->unit == 'litri') {
                 $productReports[$return->bread_id]['returns_litri'] = $return->total_quantity;
+            } else if ($return->unit == 'pz') {
+                $productReports[$return->bread_id]['returns_pz'] = $return->total_quantity;
             }
         }
         
@@ -141,8 +149,12 @@ class SuppliersController extends Controller
         $totalReturnsLitri = (clone $baseReturnsQuery)->where('unit', 'litri')->sum('quantity');
         $totalDeliveriesKg = (clone $baseDeliveriesQuery)->where('unit', 'kg')->sum('quantity');
         $totalReturnsKg = (clone $baseReturnsQuery)->where('unit', 'kg')->sum('quantity');
+        $totalDeliveriesPz = (clone $baseDeliveriesQuery)->where('unit', 'pz')->sum('quantity');
+        $totalReturnsPz = (clone $baseReturnsQuery)->where('unit', 'pz')->sum('quantity');
+        
         $balanceLitri = $totalDeliveriesLitri - $totalReturnsLitri;
         $balanceKg = $totalDeliveriesKg - $totalReturnsKg;
+        $balancePz = $totalDeliveriesPz - $totalReturnsPz;
 
         return view('suppliers.show', [
             "supplier" => $supplier,
@@ -155,6 +167,9 @@ class SuppliersController extends Controller
             "totalDeliveriesKg" => $totalDeliveriesKg,
             "totalReturnsKg" => $totalReturnsKg,
             "balanceKg" => $balanceKg,
+            "totalDeliveriesPz" => $totalDeliveriesPz,
+            "totalReturnsPz" => $totalReturnsPz,
+            "balancePz" => $balancePz,
             "selectedMonth" => $selectedMonth,
             "selectedYear" => $selectedYear,
             "productReports" => $productReports,
